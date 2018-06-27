@@ -8,7 +8,7 @@ const getAllProducts = (req, res, next) => {
     const page = Number(req.query.page) || 1
     const search = req.query.search || null
     
-    if(limit < 0) return res.status(400).send({error: 'limit cant be less than 0'})
+    if(limit < 1) return res.status(400).send({error: 'limit cant be less than 0'})
     if(page < 0) return res.status(400).send({error: 'page cant be less than 0'})
     if(['name', 'likes'].indexOf(orderBy) == -1 ) return res.status(400).send({error: 'Invalid orderBy parameter. Must be "likes" or "name"'})
     if(['asc', 'desc'].indexOf(sort) == -1) return res.status(400).send({error: 'Invalid sort parameter. Must be "asc" or "desc"'})

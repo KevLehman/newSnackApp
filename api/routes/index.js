@@ -20,7 +20,7 @@ module.exports = router = (app, passport) => {
                     if(err) {
                         res.send(err)
                     }
-                    console.log(req.user)
+                    
                     const token = jwt.sign(user, secret)
                     return res.send({user, token})
                 })
