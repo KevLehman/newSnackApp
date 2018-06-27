@@ -21,7 +21,9 @@ module.exports = router = (app, passport) => {
                         res.send(err)
                     }
                     console.log(req.user)
-                    const token = jwt.sign(user, secret)
+                    const token = jwt.sign(user, secret, {
+                        expiresIn: '200'
+                    })
                     return res.send({user, token})
                 })
             })(req, res)
