@@ -34,7 +34,7 @@ module.exports = (passport) => {
     passport.use(new JWTStrategy({
         jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
         secretOrKey: process.env.secret
-    }, (jwtPayload, done) =>{
+        }, (jwtPayload, done) =>{
         return Users.findById(jwtPayload.id)
             .then(user => {
                 return done(null, user.toJson())

@@ -160,7 +160,7 @@ const buyProduct = (req, res, next) => {
     Products.findOne({
         where: {id: productId}
     }).then(snack => {
-        if(!snack) return res.status(404).send([])
+        if(!snack) return res.status(404).send([]);
 
         if(snack.stock < 0) {
             return res.status(400).send({error: 'Theres no more stock of this product'})
