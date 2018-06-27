@@ -11,13 +11,6 @@ require('./api/config/passport')(passport);
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-// for passport
-app.use(session({
-    secret: secret,
-    resave: false,
-    saveUninitialized: false
-}))
-
 app.use(passport.initialize())
 app.use(passport.session())
 

@@ -1,4 +1,7 @@
 const LocalStrategy = require('passport-local').Strategy
+const passportJWT = require('passport-jwt')
+const JWTStrategy = passportJWT.Strategy
+const ExtractJWT = passportJWT.ExtractJwt
 
 const { Users } = require('../models')
 
@@ -16,7 +19,6 @@ module.exports = (passport) => {
             })
     })
 
-
     passport.use('local', new LocalStrategy(( username, password, done) => {
         Users.findOne({
             where: {username: username}
@@ -27,5 +29,17 @@ module.exports = (passport) => {
         }).catch((err) => {
             return done(err)
         })
+    }))
+
+    passport.use(new JWTStrategy({
+        jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+        secretOrKey: process.env.secret
+    }, (jwtPayload, done) =>{
+        return Users.findById(jwtPayload.id)
+            .then(user => {
+                return done(null, user.toJson())
+            }).catch(err => {
+                return done(err)
+            })
     }))
 }
