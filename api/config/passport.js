@@ -10,7 +10,7 @@ module.exports = (passport) => {
         done(null, user.id)
     })
 
-    passport.deserializeUser((id, done) =>{
+    passport.deserializeUser((id, done) => {
         Users.findById(id)
             .then((user) => {
                 done(null, user.toJson())
@@ -19,12 +19,14 @@ module.exports = (passport) => {
             })
     })
 
-    passport.use('local', new LocalStrategy(( username, password, done) => {
+    passport.use('local', new LocalStrategy((username, password, done) => {
         Users.findOne({
-            where: {username: username}
+            where: {
+                username: username
+            }
         }).then((user) => {
-            if(!user) return done(null, false)
-            if(!user.validatePassword(password)) return done(null, false)
+            if (!user) return done(null, false)
+            if (!user.validatePassword(password)) return done(null, false)
             return done(null, user.toJson())
         }).catch((err) => {
             return done(err)
@@ -34,7 +36,7 @@ module.exports = (passport) => {
     passport.use(new JWTStrategy({
         jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
         secretOrKey: process.env.secret
-    }, (jwtPayload, done) =>{
+    }, (jwtPayload, done) => {
         return Users.findById(jwtPayload.id)
             .then(user => {
                 return done(null, user.toJson())
