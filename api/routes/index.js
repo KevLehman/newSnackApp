@@ -1,13 +1,13 @@
-const { likes, products } = require('../controllers')
-const { isAdmin } = require('../middlewares')
-const helpers = require('../helpers')
+const { likes, products, users } = require('../controllers')
+const { isAdmin, isValidToken } = require('../middlewares')
+const { tokens } = require('../helpers')
 const jwt = require('jsonwebtoken');
 const { secret } = process.env;
 
 module.exports = router = (app, passport) => {
 
-    app.use('/products/:productId/like', passport.authenticate('jwt', {session:false}))
-    app.use('/products/:productId/buy', passport.authenticate('jwt', {session:false}))
+    app.use('/products/:productId/like', passport.authenticate('jwt', {session:false}), isValidToken)
+    app.use('/products/:productId/buy', passport.authenticate('jwt', {session:false}), isValidToken)
 
     app.route('/users/login')
         .post((req, res, next) => {
@@ -22,29 +22,33 @@ module.exports = router = (app, passport) => {
                     }
                     console.log(req.user)
                     const token = jwt.sign(user, secret, {
-                        expiresIn: '200'
+                        expiresIn: '12h'
                     })
-                    return res.send({user, token})
+                    return res.send(token)
                 })
             })(req, res)
         })
     
     app.route('/users/logout')
-        .post(passport.authenticate('jwt', {session:false}), (req, res) => {
+        .post(passport.authenticate('jwt', {session:false}), isValidToken, (req, res) => {
+            tokens.invalidateToken(req.user.id, req.headers.authorization)
             req.logout()
             res.status(200).send([])
         })
+    
+    app.route('/users/create')
+        .post(passport.authenticate('jwt', {session:false}), isValidToken, isAdmin, users.createUser)
 
     app.route('/products')
-        .get(products.getAllProducts)
-        .post(passport.authenticate('jwt', {session:false}), isAdmin, products.createAProduct)
+        .get(passport.authenticate('jwt', {session:false}),isValidToken, products.getAllProducts)
+        .post(passport.authenticate('jwt', {session:false}), isValidToken, isAdmin, products.createAProduct)
     
     
     app.route('/products/:productId')
         .get(products.getThisProduct)
-        .put(passport.authenticate('jwt', {session:false}), isAdmin, products.updateProduct)
-        .delete(passport.authenticate('jwt', {session:false}), isAdmin, products.deleteProduct)
-        .patch(passport.authenticate('jwt', {session:false}), isAdmin, products.updateProperties)
+        .put(passport.authenticate('jwt', {session:false}), isValidToken, isAdmin, products.updateProduct)
+        .delete(passport.authenticate('jwt', {session:false}), isValidToken, isAdmin, products.deleteProduct)
+        .patch(passport.authenticate('jwt', {session:false}), isValidToken, isAdmin, products.updateProperties)
      
     app.route('/products/:productId/buy')
         .post(products.buyProduct)

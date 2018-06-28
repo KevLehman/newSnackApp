@@ -28,7 +28,7 @@ module.exports = function(sequelize, DataTypes) {
 	Users.prototype.validatePassword = function (passwd){
 		return bcrypt.compareSync(passwd, this.password)
 	}
-	Users.prototype.hashPassword = function (password) {
+	Users.hashPassword = function (password) {
 		return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null)
 	}
 	Users.prototype.isAdmin = function () { 
