@@ -36,9 +36,12 @@ module.exports = router = (app, passport) => {
             res.status(200).send([])
         })
     
-    app.route('/users/create')
+    app.route('/users/create/admin')
         .post(passport.authenticate('jwt', {session:false}), isValidToken, isAdmin, users.createUser)
-
+    
+    app.route('/users/create')
+        .post(users.createUser)
+    
     app.route('/products')
         .get(passport.authenticate('jwt', {session:false}),isValidToken, products.getAllProducts)
         .post(passport.authenticate('jwt', {session:false}), isValidToken, isAdmin, products.createAProduct)
